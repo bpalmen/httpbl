@@ -1,0 +1,14 @@
+# This README is under development:
+
+Basic usage (Rack):
+
+#/config.ru
+require 'httpbl'
+use Httpbl, :api_key => "#{Your HTTP:BL API key from http://projecthoneypot.org}"
+
+Basic usage (Rails):
+
+#/environment.rb
+require 'httpbl'
+config.middleware.insert_before Rack::Lock, Httpbl, :api_key => "#{Your HTTP:BL API key from http://projecthoneypot.org}"
+
