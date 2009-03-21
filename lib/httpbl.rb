@@ -1,6 +1,6 @@
 # The Httpbl middleware 
 
-class Httpbl
+class HttpBL
   autoload :Resolv, 'resolv'
   
   def initialize(app, options = {})
@@ -11,8 +11,7 @@ class Httpbl
                 :deny_types => [1, 2, 4, 8, 16, 32, 64, 128]
                 # 8..128 aren't used as of 3/2009, but might be used in the future
                 }.merge(options)
-    raise "Missing :api_key argument for HTTP:BL middleware" unless @options[:api_key]
-    @resolver = Resolv::DNS.new
+    raise "Missing :api_key for Http:BL middleware" unless @options[:api_key]
   end
   
   def call(env)
@@ -20,6 +19,7 @@ class Httpbl
   end
   
   def _call(env)
+    @resolver = Resolv::DNS.new
     query = @options[:api_key] + '.' + Rack::Request.new(env).ip.split('.').reverse.join('.') + '.dnsbl.httpbl.org'
     @bl_response = (@resolver.getaddress(query).to_s rescue nil )
     if @bl_response and blocked?(@bl_response)

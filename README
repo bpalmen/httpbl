@@ -1,14 +1,136 @@
-# This README is under development:
+HttpBL
+===========
 
-Basic usage (Rack):
+HttpBL is drop-in IP-filtering middleware for Rails 2.3+ and other Rack-based 
+applications. It resolves information about each request's source IP address 
+from the Http:BL service at http://projecthoneypot.org, and denies access to
+clients whose IP addresses are associated with suspicious behavior like impolite
+crawling, comment-spamming and email-harvesting.
 
-#/config.ru
-require 'httpbl'
-use Httpbl, :api_key => "#{Your HTTP:BL API key from http://projecthoneypot.org}"
+	*	Deny access to IP addresses that are associated with suspicious 
+		behavior which exceeds a customizable threshold.
+	*	Expire blocked IPs that have not been associated with suspicious
+		behavior after a customizable period of days.
+	* 	Identify common search engines by IP address (not User-Agent), and
+		disallow access to a specific subset.
 
-Basic usage (Rails):
+Installation
+------------
 
-#/environment.rb
-require 'httpbl'
-config.middleware.insert_before Rack::Lock, Httpbl, :api_key => "#{Your HTTP:BL API key from http://projecthoneypot.org}"
+	gem install httpbl
+	
+Basic Usage
+------------
 
+HttpBL is Rack middleware, and can be used with any Rack-based application. First,
+you must obtain an API key for the Http:BL service at http://projecthoneypot.org
+To add HttpBL to your middleware stack, simply add the following to config.ru:
+
+	require 'httpbl'
+	
+	use HttpBL, :api_key => "YOUR API KEY"
+	
+For Rails 2.3+ add the following to environment.rb:
+	
+	config.gem 'httpbl'
+	
+	config.middleware.use HttpBL, :api_key => "YOUR API KEY"
+	
+Advanced Usage
+-------------
+
+To insert HttpBL at the top of the Rails rackstack:
+	(use 'rake middleware' to confirm that Rack::Lock is at the top of the stack)
+	
+	config.middleware.insert_before(Rack::Lock, HttpBL, :api_key => "YOUR API KEY")
+	
+To customize HttpBL's filtering behavior, use the permitted options:
+
+	use HttpBL, :api_key => "YOUR API KEY",
+				:deny_types => [1, 2, 4],
+				:threat_level_threshold => 1,
+				:age_threshold => 3,
+				:blocked_search_engines => [0]
+
+Available Options:
+
+The following options (shown with default values) are available to 
+customize the particular types of suspicious activity you wish to thwart:
+
+	:deny_types => [1, 2, 4, 8, 16, 32, 64, 128]
+		
+		Project Honeypot classifies suspicious behavior as belonging to
+		certain types, which are identified in the API's response to
+		each IP lookup. You can tell HttpBL to only deny certain kinds
+		of behavior by changing this to a subset of those possible.
+		
+		As of March 2009, only types 1, 2, and 4 have been specified,
+		but additional types are reserved for the future and HttpBL checks
+		against all of the anticipated type codes by default.  Thus, 
+		there may be a very small performance advantage to setting
+		:deny_types => [1, 2, 4] simply to exclude checks for codes 
+		that aren't (yet) being used; however, this will have to be 
+		updated if more codes come into use, whereas the default 
+		requires no further attention.
+		
+		The current types are:
+			1: Suspicious
+			2: Harvester
+			4: Comment Spammer
+			
+	:threat_level_threshold => 3
+	
+		The threat level reported by Project Honeypot is based on a 
+		logarithmic scale, approximated by:
+			1: 1 spam
+			25: 100 spam
+			50: 10,000 spam
+			100: 1,000,000 spam.
+		in which spam is pronounced spam even in the plural.
+		
+		Choosing a threat level threshold can be tricky business if
+		one isn't sure how accurate the measure of threat is, since it 
+		would be improper to block legitimate traffic by mistake. Because
+		the email addresses that Project Honeypot uses as spam-bait are unique,
+		artificial, and well-hidden, NO email should be sent to those addresses
+		at all, and it is fair to assume that even the low threat level 
+		associated with just a few spam is still siginificant.
+		
+		With that in mind, the default threshold is 3; if you want to
+		filter more aggressively, set :threat_level_threshold => 1
+		
+	:age_threshold => 10
+		
+		This sets the number of days that IP addresses that have been
+		associated with suspicous activity must wait to regain access after
+		the suspicious activity has ceased. Keeping this at a sane value will
+		allow IPs that are reassigned or cleaned up to expire from the blacklist.
+		
+		If you want to be more aggressive (require a longer cool-off-period),
+		set :age_threshold => 30; if you want to let IPs back in after just a
+		few days, set :age_threshold => 5
+		
+	:blocked_search_engines => []
+	
+		Because Project Honeypot identifies search engine traffic by IP
+		address, this filter may be used to exclude certain robots from your
+		site. If one presumes that request-IPs are at least marginally more
+		difficult to spoof than User-Agent strings, this filter may be marginally
+		more effective than some robot detection systems at identifying robots.
+		
+		If there are particular search engines that you would like to exclude
+		from your site, set :blocked_search_engines => [0, ... ] where the codes
+		defined by http://projecthoneypot.org/httpbl_api are:
+		
+			0: Misc
+			1: AltaVista	
+			2: Ask
+			3: Baidu
+			4: Excite
+			5: Google
+			6: Looksmart
+			7: Lycos
+			8: MSN
+			9: Yahoo
+			10: Cuil
+			11: InfoSeek
