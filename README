@@ -5,7 +5,7 @@ HttpBL is drop-in IP-filtering middleware for Rails 2.3+ and other Rack-based
 applications. It resolves information about each request's source IP address 
 from the Http:BL service at http://projecthoneypot.org, and denies access to
 clients whose IP addresses are associated with suspicious behavior like impolite
-crawling, comment-spamming and email-harvesting.
+crawling, comment-spamming, dictionary attacks, and email-harvesting.
 
 	*	Deny access to IP addresses that are associated with suspicious 
 		behavior which exceeds a customizable threshold.

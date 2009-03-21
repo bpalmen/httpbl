@@ -19,10 +19,11 @@ class HttpBL
   end
   
   def _call(env)
-    query = @options[:api_key] + '.' + Rack::Request.new(env).ip.split('.').reverse.join('.') + '.dnsbl.httpbl.org'
+    ip = Rack::Request.new(env).ip
+    query = @options[:api_key] + '.' + ip.split('.').reverse.join('.') + '.dnsbl.httpbl.org'
     @bl_response = (Resolv::DNS.new.getaddress(query).to_s rescue nil)
     if @bl_response and blocked?(@bl_response)
-      [403, {"Content-Type" => "text/html"}, "<h1>403 Forbidden</h1> Request IP is listed as suspicious by <a href='http://projecthoneypot.org'>Project Honeypot</a>"]
+      [403, {"Content-Type" => "text/html"}, "<h1>403 Forbidden</h1> Request IP is listed as suspicious by <a href='http://projecthoneypot.org/ip_#{ip}'>Project Honeypot</a>"]
     else
       @app.call(env)
     end
