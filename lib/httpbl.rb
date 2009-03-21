@@ -7,7 +7,7 @@ class HttpBL
     @app = app
     @options = {:blocked_search_engines => [],
                 :age_threshold => 10,
-                :threat_level_threshold => 3,
+                :threat_level_threshold => 2,
                 :deny_types => [1, 2, 4, 8, 16, 32, 64, 128]
                 # 8..128 aren't used as of 3/2009, but might be used in the future
                 }.merge(options)
@@ -19,9 +19,8 @@ class HttpBL
   end
   
   def _call(env)
-    @resolver = Resolv::DNS.new
     query = @options[:api_key] + '.' + Rack::Request.new(env).ip.split('.').reverse.join('.') + '.dnsbl.httpbl.org'
-    @bl_response = (@resolver.getaddress(query).to_s rescue nil )
+    @bl_response = (Resolv::DNS.new.getaddress(query).to_s rescue nil)
     if @bl_response and blocked?(@bl_response)
       [403, {"Content-Type" => "text/html"}, "<h1>403 Forbidden</h1> Request IP is listed as suspicious by <a href='http://projecthoneypot.org'>Project Honeypot</a>"]
     else

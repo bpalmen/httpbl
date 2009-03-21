@@ -24,6 +24,7 @@ Basic Usage
 
 HttpBL is Rack middleware, and can be used with any Rack-based application. First,
 you must obtain an API key for the Http:BL service at http://projecthoneypot.org
+
 To add HttpBL to your middleware stack, simply add the following to config.ru:
 
 	require 'httpbl'
@@ -44,12 +45,12 @@ To insert HttpBL at the top of the Rails rackstack:
 	
 	config.middleware.insert_before(Rack::Lock, HttpBL, :api_key => "YOUR API KEY")
 	
-To customize HttpBL's filtering behavior, use the permitted options:
+To customize HttpBL's filtering behavior, use the available options:
 
 	use HttpBL, :api_key => "YOUR API KEY",
 				:deny_types => [1, 2, 4],
-				:threat_level_threshold => 1,
-				:age_threshold => 3,
+				:threat_level_threshold => 0,
+				:age_threshold => 5,
 				:blocked_search_engines => [0]
 
 Available Options:
@@ -78,7 +79,7 @@ customize the particular types of suspicious activity you wish to thwart:
 			2: Harvester
 			4: Comment Spammer
 			
-	:threat_level_threshold => 3
+	:threat_level_threshold => 2
 	
 		The threat level reported by Project Honeypot is based on a 
 		logarithmic scale, approximated by:
@@ -94,10 +95,10 @@ customize the particular types of suspicious activity you wish to thwart:
 		the email addresses that Project Honeypot uses as spam-bait are unique,
 		artificial, and well-hidden, NO email should be sent to those addresses
 		at all, and it is fair to assume that even the low threat level 
-		associated with just a few spam is still siginificant.
+		associated with just a few spam is still significant.
 		
-		With that in mind, the default threshold is 3; if you want to
-		filter more aggressively, set :threat_level_threshold => 1
+		With that in mind, the default threshold is 2; if you want to
+		filter more aggressively, set :threat_level_threshold => 0
 		
 	:age_threshold => 10
 		
@@ -116,7 +117,7 @@ customize the particular types of suspicious activity you wish to thwart:
 		address, this filter may be used to exclude certain robots from your
 		site. If one presumes that request-IPs are at least marginally more
 		difficult to spoof than User-Agent strings, this filter may be marginally
-		more effective than some robot detection systems at identifying robots.
+		more effective than some other robot detection systems.
 		
 		If there are particular search engines that you would like to exclude
 		from your site, set :blocked_search_engines => [0, ... ] where the codes
