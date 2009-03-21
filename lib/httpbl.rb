@@ -7,7 +7,7 @@ class HttpBL
     @app = app
     @options = {:blocked_search_engines => [],
                 :age_threshold => 10,
-                :threat_level_threshold => 5,
+                :threat_level_threshold => 3,
                 :deny_types => [1, 2, 4, 8, 16, 32, 64, 128]
                 # 8..128 aren't used as of 3/2009, but might be used in the future
                 }.merge(options)
