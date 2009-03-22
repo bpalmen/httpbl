@@ -8,8 +8,10 @@ class HttpBL
     @options = {:blocked_search_engines => [],
                 :age_threshold => 10,
                 :threat_level_threshold => 2,
-                :deny_types => [1, 2, 4, 8, 16, 32, 64, 128]
                 # 8..128 aren't used as of 3/2009, but might be used in the future
+                :deny_types => [1, 2, 4, 8, 16, 32, 64, 128],
+                # DONT set this to 0
+                :dns_timeout => 0.5
                 }.merge(options)
     raise "Missing :api_key for Http:BL middleware" unless @options[:api_key]
   end
@@ -19,14 +21,22 @@ class HttpBL
   end
   
   def _call(env)
-    ip = Rack::Request.new(env).ip
-    query = @options[:api_key] + '.' + ip.split('.').reverse.join('.') + '.dnsbl.httpbl.org'
-    @bl_response = (Resolv::DNS.new.getaddress(query).to_s rescue nil)
-    if @bl_response and blocked?(@bl_response)
-      [403, {"Content-Type" => "text/html"}, "<h1>403 Forbidden</h1> Request IP is listed as suspicious by <a href='http://projecthoneypot.org/ip_#{ip}'>Project Honeypot</a>"]
+    request = Rack::Request.new(env)
+    bl_status = resolve(request.ip)
+    if bl_status and blocked?(bl_status)
+      [403, {"Content-Type" => "text/html"}, "<h1>403 Forbidden</h1> Request IP is listed as suspicious by <a href='http://projecthoneypot.org/ip_#{request.ip}'>Project Honeypot</a>"]
     else
       @app.call(env)
     end
+    
+  end
+  
+  def resolve(ip)
+    query = @options[:api_key] + '.' + ip.split('.').reverse.join('.') + '.dnsbl.httpbl.org'
+    Timeout::timeout(@options[:dns_timeout]) do
+       Resolv::DNS.new.getaddress(query).to_s rescue nil
+    end
+    rescue Timeout::Error, Errno::ECONNREFUSED
   end
   
   def blocked?(response)

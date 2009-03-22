@@ -17,7 +17,7 @@ crawling, comment-spamming, dictionary attacks, and email-harvesting.
 Installation
 ------------
 
-	gem install httpbl
+	gem install bpalmen-httpbl
 	
 Basic Usage
 ------------
@@ -33,7 +33,7 @@ To add HttpBL to your middleware stack, simply add the following to config.ru:
 	
 For Rails 2.3+ add the following to environment.rb:
 	
-	config.gem 'httpbl'
+	require 'httpbl'
 	
 	config.middleware.use HttpBL, :api_key => "YOUR API KEY"
 	
@@ -51,7 +51,7 @@ To customize HttpBL's filtering behavior, use the available options:
 				:deny_types => [1, 2, 4],
 				:threat_level_threshold => 0,
 				:age_threshold => 5,
-				:blocked_search_engines => [0]
+				:blocked_search_engines => [0],
 
 Available Options:
 
@@ -135,3 +135,13 @@ customize the particular types of suspicious activity you wish to thwart:
 			9: Yahoo
 			10: Cuil
 			11: InfoSeek
+	
+	:dns_timeout => 0.5
+	
+		DNS requests to the Http:BL service should NEVER take this long, but if
+		they do, you can modify this setting to prevent the application from 
+		hanging until a system default timeout.  Of course, setting this timeout 
+		too low will essentially disable the filter (but 0 is a bad idea), if responses
+		can't be returned from the API before the request is permitted, by default.  
+		Best not to mess with it unless you know what you're doing - it's a safety 
+		mechanism. 
