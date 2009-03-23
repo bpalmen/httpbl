@@ -5,28 +5,28 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-	<title>bpalmen/httpbl @ GitHub</title>
+	<title>HttpBL @ GitHub</title>
 	
 	<style type="text/css">
 		body {
   		margin-top: 1.0em;
-  		background-color: #a51a30;
+  		background-color: #f3f3f3;
 		  font-family: "helvetica"; 
-  		color: #ffffff;
+  		color: #333;
     }
     #container {
       margin: 0 auto;
       width: 700px;
     }
-		h1 { font-size: 3.8em; color: #5ae5cf; margin-bottom: 3px; }
+		h1 { font-size: 3.8em; color: #000; margin-bottom: 3px; }
 		h1 .small { font-size: 0.4em; }
 		h1 a { text-decoration: none }
-		h2 { font-size: 1.5em; color: #5ae5cf; }
-    h3 { text-align: center; color: #5ae5cf; }
+		h2 { font-size: 1.5em; color: #000; }
+    h3 { text-align: center; color: #000; }
     a { color: #5ae5cf; }
     .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
     .download { float: right; }
-		pre { background: #000; color: #fff; padding: 15px;}
+		pre { background: #fff; color: #222; padding: 15px;}
     hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
     .footer { text-align:center; padding-top:30px; font-style: italic; }
 	</style>
@@ -45,49 +45,27 @@
         <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
     </div>
       
-    <h1><a href="http://github.com/bpalmen/httpbl">httpbl</a> 
-      <span class="small">by <a href="http://github.com/bpalmen">bpalmen</a></small></h1>
+    <h1><a href="http://github.com/bpalmen/httpbl">HttpBL</a> 
+      <span class="small"><a href="http://github.com/bpalmen"></a></small></h1>
 
     <div class="description">
-      HttpBL is a Rack middleware filter that blocks requests from suspicious IP addresses.
+      HttpBL is a Rack-based IP-filter that blocks requests from suspicious robots.
     </div>
 
-    <p>HttpBL is drop-in IP-filtering middleware for Rails 2.3+ and other Rack-based applications. It resolves information about each request's source IP address from the Http:BL service at http://projecthoneypot.org, and denies access to clients whose IP addresses are associated with suspicious behavior like impolite crawling, comment-spamming and email-harvesting.</p><h2>Dependencies</h2>
+    <p>HttpBL is IP-filtering middleware for Rails 2.3+ and other Rack-based applications. It resolves information about each request's source IP address from the Http:BL service at http://projecthoneypot.org, and denies access to clients whose IP addresses are associated with suspicious behavior like impolite crawling, comment-spamming and email-harvesting.</p><h2>Dependencies</h2>
 <p>Rack</p>
 <h2>Install</h2>
-<p>See README</p>
-<h2>License</h2>
-<p>The MIT License
+<p>gem install httpbl</p>
+<p>(development) gem install bpalmen-httpbl</p>
 
-Copyright (c) 2009 Brandon Palmen
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-</p>
-<h2>Authors</h2>
-<p>Brandon Palmen (brandon.palmen@gmail.com)<br/><br/>      </p>
-<h2>Contact</h2>
-<p>Brandon Palmen (brandon.palmen@gmail.com)<br/>      </p>
-
+<h2>Author</h2>
+<p>Brandon Palmen<br/><br/>      </p>
 
     <h2>Download</h2>
+	<p>Official releases can be found at <a href="http://rubyforge.org/frs/?group_id=8041">Rubyforge</a></p>
+	
     <p>
-      You can download this project in either
+      Development releases are hosted on GitHub in
       <a href="http://github.com/bpalmen/httpbl/zipball/master">zip</a> or
       <a href="http://github.com/bpalmen/httpbl/tarball/master">tar</a> formats.
     </p>
