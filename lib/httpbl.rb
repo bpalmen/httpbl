@@ -17,8 +17,8 @@ class HttpBL
                 }.merge(options)
     raise "Missing :api_key for Http:BL middleware" unless @options[:api_key]
     if @options[:memcached_server]
-      require 'memcached'
-      @cache = Memcached.new(@options[:memcached_server], @options[:memcached_options])
+      require 'memcache'
+      @cache = MemCache.new(@options[:memcached_server], @options[:memcached_options])
     end
   end
   
@@ -37,20 +37,17 @@ class HttpBL
     
   end
   
-   def check(ip)
+  def check(ip)
     @cache ? cache_check(ip) : resolve(ip)
   end
   
   def cache_check(ip)
     cache = @cache.clone if @cache
-    begin
-    result = cache.get(ip)
-    rescue 
-      result = resolve(ip)
-      cache.set(ip, result, 9000)
+    unless response = cache.get(ip)
+      response = resolve(ip)
+      cache.set(ip, response, 1.hour)
     end
-    cache.destroy
-    return result
+    return response
   end
   
   def resolve(ip)

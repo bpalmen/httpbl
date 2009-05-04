@@ -1,13 +1,13 @@
 Gem::Specification.new do |s|
   s.name = 'httpbl'
-  s.version = '0.1.3'
-  s.date = '2009-03-20'
+  s.version = '0.1.4'
+  s.date = '2009-05-03'
   s.homepage = "http://bpalmen.github.com/httpbl/"   
   s.authors = ["Brandon Palmen"]
   s.email = "brandon.palmen@gmail.com"
   s.rubyforge_project = 'httpbl'   
-  s.summary = "HttpBL is a Rack/Rails middleware filter that blocks requests from suspicious IP addresses."
-  s.description = "HttpBL is a Rack/Rails middleware filter that blocks requests from suspicious IP addresses."
+  s.summary = "HttpBL is a Rack middleware filter that blocks requests from suspicious IP addresses."
+  s.description = "HttpBL is a Rack middleware filter that blocks requests from suspicious IP addresses."
    
   s.files = %w[ 
     README
