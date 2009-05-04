@@ -43,9 +43,9 @@ class HttpBL
   
   def cache_check(ip)
     cache = @cache.clone if @cache
-    unless response = cache.get(ip)
+    unless response = cache.get("httpbl_#{ip}")
       response = resolve(ip)
-      cache.set(ip, response, 1.hour)
+      cache.set("httpbl_#{ip}", response, 1.hour)
     end
     return response
   end
@@ -53,7 +53,8 @@ class HttpBL
   def resolve(ip)
     query = @options[:api_key] + '.' + ip.split('.').reverse.join('.') + '.dnsbl.httpbl.org'
     Timeout::timeout(@options[:dns_timeout]) do
-       Resolv::DNS.new.getaddress(query).to_s rescue nil
+       Resolv::DNS.new.getaddress(query).to_s rescue false
+	puts "resolving"
     end
     rescue Timeout::Error, Errno::ECONNREFUSED
   end
