@@ -11,9 +11,15 @@ class HttpBL
                 # 8..128 aren't used as of 3/2009, but might be used in the future
                 :deny_types => [1, 2, 4, 8, 16, 32, 64, 128],
                 # DONT set this to 0
-                :dns_timeout => 0.5
+                :dns_timeout => 0.5,
+                :memcached_server => nil,
+                :memcached_options => {}
                 }.merge(options)
     raise "Missing :api_key for Http:BL middleware" unless @options[:api_key]
+    if @options[:memcached_server]
+      require 'memcached'
+      @cache = Memcached.new(@options[:memcached_server], @options[:memcached_options])
+    end
   end
   
   def call(env)
@@ -22,13 +28,29 @@ class HttpBL
   
   def _call(env)
     request = Rack::Request.new(env)
-    bl_status = resolve(request.ip)
+    bl_status = check(request.ip)
     if bl_status and blocked?(bl_status)
       [403, {"Content-Type" => "text/html"}, "<h1>403 Forbidden</h1> Request IP is listed as suspicious by <a href='http://projecthoneypot.org/ip_#{request.ip}'>Project Honeypot</a>"]
     else
       @app.call(env)
     end
     
+  end
+  
+   def check(ip)
+    @cache ? cache_check(ip) : resolve(ip)
+  end
+  
+  def cache_check(ip)
+    cache = @cache.clone if @cache
+    begin
+    result = cache.get(ip)
+    rescue 
+      result = resolve(ip)
+      cache.set(ip, result, 9000)
+    end
+    cache.destroy
+    return result
   end
   
   def resolve(ip)
