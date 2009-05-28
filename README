@@ -13,11 +13,12 @@ crawling, comment-spamming, dictionary attacks, and email-harvesting.
 		behavior after a customizable period of days.
 	* 	Identify common search engines by IP address (not User-Agent), and
 		disallow access to a specific subset.
+	*	Optionally use memcached to avoid repeated look-ups per client-session
 
 Installation
 ------------
 
-	gem install bpalmen-httpbl
+	gem install httpbl
 	
 Basic Usage
 ------------
@@ -52,11 +53,13 @@ To customize HttpBL's filtering behavior, use the available options:
 				:threat_level_threshold => 0,
 				:age_threshold => 5,
 				:blocked_search_engines => [0],
+				:memcached_server => "127.0.0.1:11211",
+				:memcached_options => {see: memcached-client documentation}
 
 Available Options:
 
 The following options (shown with default values) are available to 
-customize the particular types of suspicious activity you wish to thwart:
+customize the behavior of the httpbl middleware filter:
 
 	:deny_types => [1, 2, 4, 8, 16, 32, 64, 128]
 		
@@ -135,6 +138,23 @@ customize the particular types of suspicious activity you wish to thwart:
 			9: Yahoo
 			10: Cuil
 			11: InfoSeek
+	
+	:memcached_server => nil
+	:memcached_options => {}
+	
+		When using httpbl in a production environment, it is *strongly* recommended
+		that you configure httpbl to use memcached to temporarily store the blacklist
+		status of client ip addresses.  This greatly enhances the efficiency of the
+		filter because it need only look up each client ip address once per session,
+		instead of once per request.  It also reduces the potential burden of a 
+		popular web application that uses httpbl on project honeypot's api services.
+		
+		Simply set :memcached_server and :memcached_options according to the 
+		conventions of the memcache-client ruby library; for example:
+		:memcached_server => '127.0.0.1:11211', :memcached_options => {:namespace => 'my_app'}
+		
+		memcache-client is included in rails by default, but if you're using rack 
+		without rails, you will need to install and require the memcache-client gem. 
 	
 	:dns_timeout => 0.5
 	

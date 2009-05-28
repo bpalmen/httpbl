@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name = 'httpbl'
   s.version = '0.1.5'
-  s.date = '2009-05-03'
+  s.date = '2009-05-28'
   s.homepage = "http://bpalmen.github.com/httpbl/"   
   s.authors = ["Brandon Palmen"]
   s.email = "brandon.palmen@gmail.com"
