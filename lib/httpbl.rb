@@ -11,7 +11,7 @@ class HttpBL
                 :deny_types => [1, 2, 4, 8, 16, 32, 64, 128], # 8..128 aren't used as of 3/2009, but might be used in the future
                 :dns_timeout => 0.5,
                 :memcached_server => nil,
-		:memcached_options => {}
+                :memcached_options => {}
                 }.merge(options)
     raise "Missing :api_key for Http:BL middleware" unless @options[:api_key]
     if @options[:memcached_server]
@@ -52,7 +52,6 @@ class HttpBL
     query = @options[:api_key] + '.' + ip.split('.').reverse.join('.') + '.dnsbl.httpbl.org'
     Timeout::timeout(@options[:dns_timeout]) do
        Resolv::DNS.new.getaddress(query).to_s rescue false
-	puts "resolving"
     end
     rescue Timeout::Error, Errno::ECONNREFUSED
   end
