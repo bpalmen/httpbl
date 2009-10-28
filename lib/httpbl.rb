@@ -2,13 +2,14 @@
 
 class HttpBL
   autoload :Resolv, 'resolv'
-  
+  encourage_safe_timeouts
+
   def initialize(app, options = {})
     @app = app
     @options = {:blocked_search_engines => [],
                 :age_threshold => 10,
                 :threat_level_threshold => 2,
-                :deny_types => [1, 2, 4, 8, 16, 32, 64, 128], # 8..128 aren't used as of 3/2009, but might be used in the future
+                :deny_types => [1, 2, 4, 8, 16, 32, 64, 128], # 8..128 aren't used as of 10/2009, but might be used in the future
                 :dns_timeout => 0.5,
                 :memcached_server => nil,
                 :memcached_options => {}
@@ -50,7 +51,7 @@ class HttpBL
   
   def resolve(ip)
     query = @options[:api_key] + '.' + ip.split('.').reverse.join('.') + '.dnsbl.httpbl.org'
-    Timeout::timeout(@options[:dns_timeout]) do
+    DnsTimeout::timeout(@options[:dns_timeout]) do
        Resolv::DNS.new.getaddress(query).to_s rescue false
     end
     rescue Timeout::Error, Errno::ECONNREFUSED
@@ -60,14 +61,29 @@ class HttpBL
     response = response.split('.').collect!(&:to_i)
     if response[0] == 127 
       if response[3] == 0
-        @blocked = @options[:blocked_search_engines].include?(response[2])
+        blocked = @options[:blocked_search_engines].include?(response[2])
       else 
-        @blocked = @options[:deny_types].collect{|key| response[3] & key == key }.any?
-        @blocked = @blocked and response[2] > @options[:threat_level_threshold] 
-        @blocked = @blocked and response[1] < @options[:age_threshold]
+        blocked = @options[:deny_types].collect{|key| response[3] & key == key }.any? and response[2] > @options[:threat_level_threshold] and response[1] < @options[:age_threshold]
       end
     end
-    return @blocked
+    return blocked
+  end
+
+private
+
+  def encourage_safe_timeouts
+    if /^1\.8/ =~ RUBY_VERSION 
+      begin
+        require 'system_timer'
+        DnsTimeout = SystemTimer
+      rescue LoadError
+        require 'timeout'
+        DnsTimeout = Timeout
+      end
+    else
+      require 'timeout'
+      DnsTimeout = Timeout
+    end
   end
 
 end

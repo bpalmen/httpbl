@@ -54,7 +54,7 @@ To customize HttpBL's filtering behavior, use the available options:
 				:age_threshold => 5,
 				:blocked_search_engines => [0],
 				:memcached_server => "127.0.0.1:11211",
-				:memcached_options => {see: memcached-client documentation}
+				:memcached_options => {see: memcache-client documentation}
 
 Available Options:
 
@@ -124,9 +124,9 @@ customize the behavior of the httpbl middleware filter:
 		
 		If there are particular search engines that you would like to exclude
 		from your site, set :blocked_search_engines => [0, ... ] where the codes
-		defined by http://projecthoneypot.org/httpbl_api are:
+		defined by http://projecthoneypot.org/httpbl_api.php are:
 		
-			0: Misc
+			0: Undocumented
 			1: AltaVista	
 			2: Ask
 			3: Baidu
@@ -138,6 +138,7 @@ customize the behavior of the httpbl middleware filter:
 			9: Yahoo
 			10: Cuil
 			11: InfoSeek
+			12: Miscellaneous
 	
 	:memcached_server => nil
 	:memcached_options => {}
@@ -158,10 +159,10 @@ customize the behavior of the httpbl middleware filter:
 	
 	:dns_timeout => 0.5
 	
-		DNS requests to the Http:BL service should NEVER take this long, but if
-		they do, you can modify this setting to prevent the application from 
+		DNS requests to the Http:BL service shouldn't take this long, but if
+		they do, you can modify this setting to prevent the request from 
 		hanging until a system default timeout.  Of course, setting this timeout 
 		too low will essentially disable the filter (but 0 is a bad idea), if responses
-		can't be returned from the API before the request is permitted, by default.  
+		can't be returned from the API before the request is permitted.  
 		Best not to mess with it unless you know what you're doing - it's a safety 
 		mechanism. 
