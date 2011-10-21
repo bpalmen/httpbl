@@ -1,4 +1,4 @@
-# The Httpbl middleware 
+# The Httpbl middleware
 
 class HttpBL
   autoload :Resolv, 'resolv'
@@ -20,11 +20,11 @@ class HttpBL
       @cache = MemCache.new(@options[:memcached_server], @options[:memcached_options])
     end
   end
-  
+
   def call(env)
     dup._call(env)
   end
-  
+
   def _call(env)
     request = Rack::Request.new(env)
     bl_status = check(request.ip)
@@ -33,13 +33,13 @@ class HttpBL
     else
       @app.call(env)
     end
-    
+
   end
-  
+
   def check(ip)
     @cache ? cache_check(ip) : resolve(ip)
   end
-  
+
   def cache_check(ip)
     cache = @cache.clone if @cache
     unless response = cache.get("httpbl_#{ip}")
@@ -48,7 +48,7 @@ class HttpBL
     end
     return response
   end
-  
+
   def resolve(ip)
     query = @options[:api_key] + '.' + ip.split('.').reverse.join('.') + '.dnsbl.httpbl.org'
     DnsTimeout::timeout(@options[:dns_timeout]) do
@@ -56,13 +56,13 @@ class HttpBL
     end
     rescue Timeout::Error, Errno::ECONNREFUSED
   end
-  
+
   def blocked?(response)
     response = response.split('.').collect!(&:to_i)
-    if response[0] == 127 
+    if response[0] == 127
       if response[3] == 0
         blocked = @options[:blocked_search_engines].include?(response[2])
-      else 
+      else
         blocked = @options[:deny_types].collect{|key| response[3] & key == key }.any? and response[2] > @options[:threat_level_threshold] and response[1] < @options[:age_threshold]
       end
     end
@@ -72,7 +72,7 @@ class HttpBL
 private
 
   def encourage_safe_timeouts
-    if /^1\.8/ =~ RUBY_VERSION 
+    if /^1\.8/ =~ RUBY_VERSION
       begin
         require 'system_timer'
         DnsTimeout = SystemTimer
